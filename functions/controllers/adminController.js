@@ -6,13 +6,14 @@ const createTransaction = require("../utility/creditTransiction");
 const loginAdmin = async (req, res) => {
   try {
     const { mobile, password } = req.body;
-    // const user = await User.findById(process.env.ADMIN_ID);
     const user = await User.findOne({
       _id: process.env.ADMIN_ID,
-      mobile: process.env.ADMIN_MOBILE,
-      password: process.env.ADMIN_PASSWORD,
+      mobile,
     });
-    if (user) {
+
+    const haveSamePassword = await bcrypt.compare(password, user.password);
+
+    if (user && haveSamePassword) {
       const token = jwt.sign(
         {
           _id: user._id,
@@ -127,7 +128,10 @@ const getAllUsers = async (req, res) => {
 const createClient = async (req, res) => {
   const { name, mobile, password, email } = req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(
+      password,
+      parseInt(process.env.PASSWORD_SALT)
+    );
     const client = new User({
       name,
       email,

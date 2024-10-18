@@ -25,7 +25,7 @@ const createCustomer = async (req, res) => {
   const { name, mobile, password, email, gender, dateOfBirth, location } =
     req.body;
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, parseInt(process.env.PASSWORD_SALT));
     const customer = new User({
       mobile,
       password: hashedPassword,
